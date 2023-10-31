@@ -27,6 +27,10 @@ def main():
         x += 1
         if x > 3200:
             x = 0
+
+
+
+
 if __name__ == "__main__":
     pg.init()
     main()
