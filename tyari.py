@@ -5,7 +5,6 @@ import pygame as pg
 WIDTH = 1297
 HEIGHT = 744
 
-#完成版
 
 class tyari():
 
