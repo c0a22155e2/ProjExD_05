@@ -4,6 +4,7 @@ import pygame as pg
 
 WIDTH = 1297
 HEIGHT = 744
+vec = pg.math.Vector2
 
 #完成版
 
@@ -21,6 +22,9 @@ class tyari():
         self.img = self.imgs[0]
         self.rct = self.img.get_rect()
         self.rct.center = xy
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+
 
 
     def change_img(self, num: int, screen: pg.Surface):
@@ -33,7 +37,44 @@ class tyari():
 
         self.rct.move_ip(0,0)
         screen.blit(self.img, self.rct)
+        self.acc = vec(0, 0.5)
+        keys = pg.key.get_pressed()
+
+    def jamp(self):
+        print(0.8*HEIGHT)
+        if self.rct.bottom == 591:
+            self.rct.move_ip(0,-20)
+            pg.time.delay(2000)
+            self.rct.move_ip(0,20)
         
+
+class Platform(pg.sprite.Sprite):
+    def __init__(self, x, y, w, h):
+        super().__init__()
+        self.image = pg.Surface((w, h))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+class Game:
+    def __init__(self):
+        # ゲームを初期化
+        self.running = True
+        pg.init()
+        pg.mixer.init()
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.clock = pg.time.Clock()
+        self.all_sprites = None
+        self.platforms = None
+        self.playing = False
+
+        self.player = None
+    def events(self):
+        for event in pg.event.get():
+            if event.type == pg.KEYUP:
+                tyari.jamp()
+
+
+
 def main():
     pg.display.set_caption("チャリ走DX")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -46,7 +87,8 @@ def main():
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: return
-        
+            if event.type == pg.KEYDOWN and event.key == pg.K_UP:
+                bird.jamp()
         screen.blit(bg_img, [0-x, 0])
         screen.blit(bg_img2, [1297-x,0])
         screen.blit(bg_img, [2594-x, 0])
