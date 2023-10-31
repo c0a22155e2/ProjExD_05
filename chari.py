@@ -5,7 +5,7 @@ class tyari():
 
     def __init__(self,num: int ,xy:tuple[int,int]):
 
-        img0 = pg.transform.rotozoom(pg.image.load(f"ex03/fig/{num}.png"), 0, 2.0)
+        img0 = pg.transform.rotozoom(pg.image.load(f"ex05/figs/{num}.png"), 0, 2.0)
         img = pg.transform.flip(img0, True, False)  # デフォルトのこうかとん（右向き）
         self.imgs = {  # 0度から反時計回りに定義
             0: img,  # 右
@@ -45,8 +45,8 @@ def main():
         screen.blit(bg_img, [0-x, 0])
         screen.blit(bg_img2, [1297-x,0])
         screen.blit(bg_img, [2594-x, 0])
-        pg.display.update()
         bird.update(screen)
+        pg.display.update()
         tmr += 1        
         clock.tick(1000)
         x += 1
