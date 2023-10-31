@@ -44,8 +44,7 @@ class tyari():
         print(0.8*HEIGHT)
         if self.rct.bottom == 591:
             self.rct.move_ip(0,-20)
-            pg.time.delay(2000)
-            self.rct.move_ip(0,20)
+            
         
 
 class Platform(pg.sprite.Sprite):
