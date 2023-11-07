@@ -5,6 +5,8 @@ import pygame as pg
 WIDTH = 1297
 HEIGHT = 744
 
+
+
 #完成版
 
 
@@ -32,6 +34,10 @@ class TYARI(pg.sprite.Sprite):
         self.img = self.imgs[0]
         self.rct = self.img.get_rect()
         self.rct.center = xy
+        self.on_floor = True
+        self.acc = 1
+        self.vel= -10
+        self.y = HEIGHT * 0.85
 
     def change_img(self, num: int, screen: pg.Surface):
         self.img = self.imgs[num]
@@ -40,6 +46,28 @@ class TYARI(pg.sprite.Sprite):
     def update(self, screen: pg.Surface):
         self.rct.move_ip(0,0)#自転車を描画
         screen.blit(self.img, self.rct)
+        if self.on_floor:
+            return
+        self.vel += self.acc
+        self.rct.y += self.vel
+        if self.rct.y> HEIGHT * 0.85:
+            self.rct.y= HEIGHT * 0.85
+            self.vel = 0
+            self.on_floor = True
+        
+
+    def jamp(self):#高さジャンプをするか決める
+        
+        if self.on_floor:
+            self.on_floor=False
+            self.vel = -30
+               
+
+    
+    def events(self):
+        for event in pg.event.get():
+            if event.type == pg.KEYUP:
+                TYARI.jamp()
 
 
 class FLOOR:
@@ -147,6 +175,8 @@ def main():
           x -= 5
           if bg < -2*WIDTH:
               bg = 0
+        if event.type == pg.KEYDOWN and event.key == pg.K_UP:
+              bird.jamp()
         bird.update(screen)
         floor.update(screen,x)
         font = pg.font.Font(None,55)
