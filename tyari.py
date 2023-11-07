@@ -83,6 +83,7 @@ class Coin(pg.sprite.Sprite):
         self.index = 0
         self.image = self.imgs[self.index]
         self.rect = self.image.get_rect()
+        self.rect.center = (,200)
         
     def update(self):
         if self.index >= len(self.imgs):
@@ -128,7 +129,7 @@ def main():
     coin = Coin()
     coins = pg.sprite.Group()
     score = Score()
-    tyaris = pg.sprite.Sprite()
+    tyaris = pg.sprite.Group()
     coin_group = pg.sprite.Group(coin)
     
     while True:
@@ -144,7 +145,6 @@ def main():
               bg = 0
         else:#反転状態
           bg -= 5
-          bird.rct.move_ip(0,-2)
           x -= 5
           if bg < -2*WIDTH:
               bg = 0
@@ -153,7 +153,7 @@ def main():
         font = pg.font.Font(None,55)
         text = font.render(str(floor.check_bound(x)) , True , (255,255,255))
         screen.blit(text,[100,100])
-        for coin in pg.sprite.groupcollide(coins, tyaris, True, True).keys():
+        for score in pg.sprite.groupcollide(coins, tyaris, True, True).keys():
             score.score_up(1)
         score.update(screen)
         if tmr % 3 == 1:
@@ -163,13 +163,22 @@ def main():
         tmr += 1     
         clock.tick(1000)
         for event in pg.event.get():
-          if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:#スペースで反転
+            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:#スペースで反転
               if reverse:
                 reverse = False
                 bird.change_img(0,screen)
               else:
                  reverse = True
                  bird.change_img(1,screen)
+            elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
+                bird.rct.move_ip(0,-10)
+            elif event.type == pg.KEYDOWN and event.key == pg.K_DOWN:
+                bird.rct.move_ip(0,+10)
+            elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
+                bird.rct.move_ip(-10,0)
+            elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
+                bird.rct.move_ip(+10,0)
+            
 if __name__ == "__main__":
     pg.init()
     main()
