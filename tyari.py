@@ -4,12 +4,8 @@ import pygame as pg
 
 WIDTH = 1297
 HEIGHT = 744
-vec = pg.math.Vector2
-is_jumping = False
-character_speed = 5
-jump_height = 591
-jump_count = 0
-character_y=0.73 *HEIGHT
+
+
 
 #完成版
 
@@ -41,10 +37,7 @@ class TYARI(pg.sprite.Sprite):
         self.on_floor = True
         self.acc = 1
         self.vel= -10
-        self.y = 400
-        
-        
-
+        self.y = HEIGHT * 0.85
 
     def change_img(self, num: int, screen: pg.Surface):
         self.img = self.imgs[num]
@@ -53,6 +46,28 @@ class TYARI(pg.sprite.Sprite):
     def update(self, screen: pg.Surface):
         self.rct.move_ip(0,0)#自転車を描画
         screen.blit(self.img, self.rct)
+        if self.on_floor:
+            return
+        self.vel += self.acc
+        self.rct.y += self.vel
+        if self.rct.y> HEIGHT * 0.85:
+            self.rct.y= HEIGHT * 0.85
+            self.vel = 0
+            self.on_floor = True
+        
+
+    def jamp(self):#高さジャンプをするか決める
+        
+        if self.on_floor:
+            self.on_floor=False
+            self.vel = -30
+               
+
+    
+    def events(self):
+        for event in pg.event.get():
+            if event.type == pg.KEYUP:
+                TYARI.jamp()
 
 
 class FLOOR:
@@ -97,7 +112,6 @@ class Coin(pg.sprite.Sprite):
         self.image = self.imgs[self.index]
         self.rect = self.image.get_rect()
         
-        
     def update(self):
         if self.index >= len(self.imgs):
             self.index = 0
@@ -108,7 +122,7 @@ class Coin(pg.sprite.Sprite):
 class Score:
     """
     コインとチャリンコが接したときにスコアを表示するクラス
-    1コイン = 1ポイント
+    1コイン　= 1ポイント
     """
     def __init__(self):
         self.font = pg.font.Font(None, 50)
@@ -125,34 +139,6 @@ class Score:
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
         screen.blit(self.image, self.rect)
         
-        if self.on_floor:
-            return
-        self.vel += self.acc
-        self.rct.y += self.vel
-        if self.rct.y> 400:
-            self.rct.y= 400
-            self.vel = 0
-            self.on_floor = True
-        
-
-    def jamp(self):#高さジャンプをするか決める
-        
-        if self.on_floor:
-            self.on_floor=False
-            time = 0
-            self.vel = -30
-    
-        
-            
-            
-
-    
-    def events(self):
-        for event in pg.event.get():
-            if event.type == pg.KEYUP:
-                TYARI.jamp()
-
-
 
 def main():
     pg.display.set_caption("チャリ走DX")
@@ -164,16 +150,13 @@ def main():
     bird = TYARI(1,(200,HEIGHT*0.85))#自転車を描画
     floor = FLOOR(1)
     reverse = False#反転
-    bg_img = pg.image.load("ex05/figs/bg.png")
-    bg_img2 = pg.transform.flip(bg_img, True ,False)
-    bird = TYARI(0,(200,400))
     tmr = 0
     bg = tmr
     x = tmr
     coin = Coin()
     coins = pg.sprite.Group()
     score = Score()
-    tyaris = pg.sprite.Group()
+    tyaris = pg.sprite.Sprite()
     coin_group = pg.sprite.Group(coin)
     
     while True:
@@ -192,15 +175,14 @@ def main():
           x -= 5
           if bg < -2*WIDTH:
               bg = 0
-          if event.type == pg.KEYDOWN and event.key == pg.K_UP:
+        if event.type == pg.KEYDOWN and event.key == pg.K_UP:
               bird.jamp()
-            
         bird.update(screen)
         floor.update(screen,x)
         font = pg.font.Font(None,55)
         text = font.render(str(floor.check_bound(x)) , True , (255,255,255))
         screen.blit(text,[100,100])
-        for score in pg.sprite.groupcollide(coins, tyaris, True, True).keys():
+        for coin in pg.sprite.groupcollide(coins, tyaris, True, True).keys():
             score.score_up(1)
         score.update(screen)
         if tmr % 3 == 1:
@@ -210,22 +192,13 @@ def main():
         tmr += 1     
         clock.tick(1000)
         for event in pg.event.get():
-            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:#スペースで反転
+          if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:#スペースで反転
               if reverse:
                 reverse = False
                 bird.change_img(0,screen)
               else:
                  reverse = True
                  bird.change_img(1,screen)
-            elif event.type == pg.KEYDOWN and event.key == pg.K_UP:
-                bird.rct.move_ip(0,-10)
-            elif event.type == pg.KEYDOWN and event.key == pg.K_DOWN:
-                bird.rct.move_ip(0,+10)
-            elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
-                bird.rct.move_ip(-10,0)
-            elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
-                bird.rct.move_ip(+10,0)
-            
 if __name__ == "__main__":
     pg.init()
     main()
