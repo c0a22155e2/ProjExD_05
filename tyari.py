@@ -7,7 +7,17 @@ HEIGHT = 744
 
 #完成版
 
-class TYARI:
+
+def check_bound(obj: pg.Rect) -> tuple[bool, bool]:
+    yoko, tate = True, True
+    if obj.left < 0 or WIDTH < obj.right:  # 横方向のはみ出し判定
+        yoko = False
+    if obj.top < 0 or HEIGHT < obj.bottom:  # 縦方向のはみ出し判定
+        tate = False
+    return yoko, tate
+
+
+class TYARI(pg.sprite.Sprite):
 
     def __init__(self,num: int ,xy:tuple[int,int]):
         img = pg.transform.rotozoom(pg.image.load(f"ex05/figs/tyari/{num}.png"), 0, 0.5)
@@ -57,6 +67,51 @@ class FLOOR:
 
     
 
+        
+
+class Coin(pg.sprite.Sprite):
+    def __init__(self):
+        """
+        コイン画像を生成する
+        """
+        super(Coin, self).__init__()
+        #画像をリストに代入する
+        self.imgs = list()
+        for i in range(1,7):
+            self.imgs.append(pg.transform.rotozoom(pg.image.load(f"ex05/coin01_gold01/{i}.png"),0,0.2))
+        
+        self.index = 0
+        self.image = self.imgs[self.index]
+        self.rect = self.image.get_rect()
+        
+    def update(self):
+        if self.index >= len(self.imgs):
+            self.index = 0
+        
+        self.image = self.imgs[self.index]
+        self.index += 1
+
+class Score:
+    """
+    コインとチャリンコが接したときにスコアを表示するクラス
+    1コイン　= 1ポイント
+    """
+    def __init__(self):
+        self.font = pg.font.Font(None, 50)
+        self.color = (0, 0, 255)
+        self.score = 0
+        self.image = self.font.render(f"Score: {self.score}", 0, self.color)
+        self.rect = self.image.get_rect()
+        self.rect.center = 100, HEIGHT-50
+    
+    def score_up(self, add):
+        self.score += add
+    
+    def update(self, screen: pg.Surface):
+        self.image = self.font.render(f"Score: {self.score}", 0, self.color)
+        screen.blit(self.image, self.rect)
+        
+
 def main():
     pg.display.set_caption("チャリ走DX")
     screen = pg.display.set_mode((WIDTH, HEIGHT))#スクリーンを描画
@@ -70,6 +125,12 @@ def main():
     tmr = 0
     bg = tmr
     x = tmr
+    coin = Coin()
+    coins = pg.sprite.Group()
+    score = Score()
+    tyaris = pg.sprite.Sprite()
+    coin_group = pg.sprite.Group(coin)
+    
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: return
@@ -92,6 +153,12 @@ def main():
         font = pg.font.Font(None,55)
         text = font.render(str(floor.check_bound(x)) , True , (255,255,255))
         screen.blit(text,[100,100])
+        for coin in pg.sprite.groupcollide(coins, tyaris, True, True).keys():
+            score.score_up(1)
+        score.update(screen)
+        if tmr % 3 == 1:
+            coin_group.update()
+        coin_group.draw(screen)
         pg.display.update()
         tmr += 1     
         clock.tick(1000)
@@ -103,7 +170,6 @@ def main():
               else:
                  reverse = True
                  bird.change_img(1,screen)
-          
 if __name__ == "__main__":
     pg.init()
     main()
