@@ -195,9 +195,6 @@ def main():
           if event.type == pg.KEYDOWN and event.key == pg.K_UP:
               bird.jamp()
             
-        screen.blit(bg_img, [0-x, 0])
-        screen.blit(bg_img2, [1297-x,0])
-        screen.blit(bg_img, [2594-x, 0])
         bird.update(screen)
         floor.update(screen,x)
         font = pg.font.Font(None,55)
