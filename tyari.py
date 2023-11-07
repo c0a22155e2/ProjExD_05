@@ -96,7 +96,7 @@ class Coin(pg.sprite.Sprite):
         self.index = 0
         self.image = self.imgs[self.index]
         self.rect = self.image.get_rect()
-        self.rect.center = (,200)
+        
         
     def update(self):
         if self.index >= len(self.imgs):
@@ -108,7 +108,7 @@ class Coin(pg.sprite.Sprite):
 class Score:
     """
     コインとチャリンコが接したときにスコアを表示するクラス
-    1コイン　= 1ポイント
+    1コイン = 1ポイント
     """
     def __init__(self):
         self.font = pg.font.Font(None, 50)
@@ -150,7 +150,7 @@ class Score:
     def events(self):
         for event in pg.event.get():
             if event.type == pg.KEYUP:
-                tyari.jamp()
+                TYARI.jamp()
 
 
 
