@@ -5,6 +5,11 @@ import pygame as pg
 WIDTH = 1297
 HEIGHT = 744
 vec = pg.math.Vector2
+is_jumping = False
+character_speed = 5
+jump_height = 591
+jump_count = 0
+character_y=0.73 *HEIGHT
 
 #完成版
 
@@ -22,8 +27,12 @@ class tyari():
         self.img = self.imgs[0]
         self.rct = self.img.get_rect()
         self.rct.center = xy
-        self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
+        self.on_floor = True
+        self.acc = 1
+        self.vel= -10
+        self.y = 400
+        
+        
 
 
 
@@ -37,36 +46,28 @@ class tyari():
 
         self.rct.move_ip(0,0)
         screen.blit(self.img, self.rct)
-        self.acc = vec(0, 0.5)
-        keys = pg.key.get_pressed()
-
-    def jamp(self):
-        print(0.8*HEIGHT)
-        if self.rct.bottom == 591:
-            self.rct.move_ip(0,-20)
-            
+        if self.on_floor:
+            return
+        self.vel += self.acc
+        self.rct.y += self.vel
+        if self.rct.y> 400:
+            self.rct.y= 400
+            self.vel = 0
+            self.on_floor = True
         
 
-class Platform(pg.sprite.Sprite):
-    def __init__(self, x, y, w, h):
-        super().__init__()
-        self.image = pg.Surface((w, h))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-class Game:
-    def __init__(self):
-        # ゲームを初期化
-        self.running = True
-        pg.init()
-        pg.mixer.init()
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-        self.clock = pg.time.Clock()
-        self.all_sprites = None
-        self.platforms = None
-        self.playing = False
+    def jamp(self):#高さジャンプをするか決める
+        
+        if self.on_floor:
+            self.on_floor=False
+            time = 0
+            self.vel = -30
+    
+        
+            
+            
 
-        self.player = None
+    
     def events(self):
         for event in pg.event.get():
             if event.type == pg.KEYUP:
@@ -80,7 +81,7 @@ def main():
     clock  = pg.time.Clock()
     bg_img = pg.image.load("ex05/figs/bg.png")
     bg_img2 = pg.transform.flip(bg_img, True ,False)
-    bird = tyari(0,(200,HEIGHT *0.73))
+    bird = tyari(0,(200,400))
     tmr = 0
     x = tmr
     while True:
@@ -88,12 +89,14 @@ def main():
             if event.type == pg.QUIT: return
             if event.type == pg.KEYDOWN and event.key == pg.K_UP:
                 bird.jamp()
+            
         screen.blit(bg_img, [0-x, 0])
         screen.blit(bg_img2, [1297-x,0])
         screen.blit(bg_img, [2594-x, 0])
         bird.update(screen)
         pg.draw.rect(screen,(255,255,255),(0,HEIGHT*0.8,WIDTH,HEIGHT))
         pg.display.update()
+
         tmr += 1        
         clock.tick(1000)
         x += 1
