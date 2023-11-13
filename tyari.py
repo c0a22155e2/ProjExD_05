@@ -79,7 +79,8 @@ class FLOOR:
 
         self.img = floor_img
         self.map = [1,1,1,1,1,1,1,1,1,1]
-        for i in range(200):
+        self.coin = [random.randint(1,10) for i in range(200)]
+        for i in range(20):
             self.map.append(random.randint(0, 4))
         self.rct = [self.img.get_rect() for i in range(len(self.map))]
             
@@ -96,6 +97,15 @@ class FLOOR:
             return True
         else:
             return False
+    
+    def finish(self,x,flag):
+        num = 0
+        if flag:#反転しているとき
+            if (x < -200) :
+                return 1
+        else:
+            if (x//66 == len(self.map)-5):
+                return 2
         
 
 class Coin(pg.sprite.Sprite):
@@ -180,8 +190,8 @@ def main():
               bird.jamp()
         bird.update(screen,reverse)
         floor.update(screen,x)
-        if floor.check_bound(x) and bird.on_floor:#ゲームオーバー時の終了画面
 
+        if floor.check_bound(x) and not(bird.on_floor):#ゲームオーバー時の終了画面
             for i in range(HEIGHT):#上から黒い幕が降ってくる
                 pg.draw.rect(screen, (0,0,0), (0,0,WIDTH,i+1))
                 pg.display.update()
@@ -198,6 +208,45 @@ def main():
             pg.display.update()
             time.sleep(5)
             pg.quit()
+
+
+        if floor.finish(bg,reverse) == 2:#右端到達時の演出
+            font = pg.font.Font(None,200)
+            text = font.render("Mode : reverse!!", True , (128,128,128))
+            for i in range(15):
+                pg.draw.rect(screen, (0,0,0), (0,0,WIDTH,HEIGHT))
+                screen.blit(text,[100,200])
+                pg.display.update()
+                time.sleep(0.1)
+                pg.draw.rect(screen, (255,0,0), (0,0,WIDTH,HEIGHT))
+                screen.blit(text,[100,200])
+                pg.display.update()
+                time.sleep(0.01)
+            reverse = True
+
+        elif floor.finish(bg,reverse) == 1:#反転後ゴール時の演出
+            font = pg.font.Font(None,200)
+            for i in range(HEIGHT):
+                pg.draw.rect(screen, (171,201,217), (0,HEIGHT-i,WIDTH,HEIGHT))
+                pg.display.update()
+                time.sleep(0.001)
+            for i in range(40):
+                text = font.render("Congratulations!!" , True , ((i * 16) %255,(i *16) %255,(i *16) %255))
+                screen.blit(text,[50,200])
+                pg.display.update()
+                time.sleep(0.1)
+            text = font.render("Congratulations!!" , True , (128,128,128))
+            screen.blit(text,[50,200])
+            pg.display.update()
+            time.sleep(2)
+            font = pg.font.Font(None,100)
+            text = font.render("SCORE : "+ str(score.score) , True , (128,128,128))
+            screen.blit(text,[450,500])
+            pg.display.update()
+            time.sleep(5)
+            pg.quit()
+            reverse = False
+
         for coin in pg.sprite.groupcollide(coins, tyaris, True, True).keys():
             score.score_up(1)
         score.update(screen)
@@ -205,7 +254,7 @@ def main():
             coin_group.update()
         coin_group.draw(screen)
         pg.display.update()
-        tmr += 1     
+        tmr += 1
         clock.tick(1000)
         for event in pg.event.get():
           if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:#スペースで反転
