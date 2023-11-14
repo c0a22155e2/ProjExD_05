@@ -259,12 +259,12 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(1000)
-        for event in pg.event.get():
-          if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:#スペースで反転
-              if reverse:
-                reverse = False
-              else:
-                reverse = True
+        #for event in pg.event.get():
+         # if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:#スペースで反転
+          #    if reverse:
+           #     reverse = False
+            #  else:
+             #   reverse = True
 if __name__ == "__main__":
     pg.init()
     main()
