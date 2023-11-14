@@ -83,7 +83,7 @@ class FLOOR:
         self.map = [1,1,1,1,1,1,1,1,1,1]
         self.coin = [random.randint(1,10) for i in range(200)]
         for i in range(200):
-            self.map.append(random.randint(0, 4))
+            self.map.append(random.randint(0, 10))
         self.rct = [self.img.get_rect() for i in range(len(self.map))]
             
     def update(self, screen: pg.Surface,x):
@@ -210,7 +210,7 @@ def main():
             pg.quit()
 
 
-        if floor.finish(bg,reverse) == 2:#右端到達時の演出
+        if floor.finish(x,reverse) == 2:#右端到達時の演出
             font = pg.font.Font(None,200)
             text = font.render("Mode : reverse!!", True , (128,128,128))
             for i in range(15):
@@ -224,7 +224,7 @@ def main():
                 time.sleep(0.01)
             reverse = True
 
-        elif floor.finish(bg,reverse) == 1:#反転後ゴール時の演出
+        elif floor.finish(x,reverse) == 1:#反転後ゴール時の演出
             font = pg.font.Font(None,200)
             for i in range(HEIGHT):
                 pg.draw.rect(screen, (171,201,217), (0,HEIGHT-i,WIDTH,HEIGHT))
